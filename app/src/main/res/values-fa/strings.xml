@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ABLE Forge</string>
+    <string name="app_subtitle">کارگاه توانا</string>
+    <string name="app_slogan">بساز. رفع خطا کن. خلق کن. هر کجا.</string>
+
+    <!-- Navigation Menu -->
+    <string name="nav_projects">پروژه‌ها</string>
+    <string name="nav_files">فایل‌ها</string>
+    <string name="nav_editor">ویرایشگر کد</string>
+    <string name="nav_git">کنترل گیت</string>
+    <string name="nav_console">کنسول دستورات</string>
+    <string name="nav_aifix">رفع خطای هوشمند</string>
+    <string name="nav_deploy">استقرار و اجرا</string>
+    <string name="nav_community">جامعه کاربری</string>
+    <string name="nav_tutorial">آموزش کار با برنامه</string>
+    <string name="nav_help">راهنمای تصویری</string>
+    <string name="nav_settings">تنظیمات</string>
+
+    <!-- Statuses -->
+    <string name="status_ready">آماده</string>
+    <string name="status_modified">تغییریافته</string>
+    <string name="status_issue">نیاز به بررسی</string>
+    <string name="status_unconfigured">تنظیم‌نشده</string>
+    <string name="status_clean">بدون تغییر</string>
+
+    <!-- Actions -->
+    <string name="action_create">ایجاد</string>
+    <string name="action_save">ذخیره</string>
+    <string name="action_run">اجرا</string>
+    <string name="action_commit">ثبت تغییرات (کامیت)</string>
+    <string name="action_cancel">انصراف</string>
+    <string name="action_delete">حذف</string>
+    <string name="action_next">بعدی</string>
+    <string name="action_back">قبلی</string>
+    <string name="action_close">بستن</string>
+    <string name="action_copy">کپی</string>
+    <string name="action_undo">بازگردانی</string>
+    <string name="action_redo">تکرار</string>
+</resources>

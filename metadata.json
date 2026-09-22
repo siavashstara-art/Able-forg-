@@ -1,0 +1,6 @@
+{
+  "name": "ABLE Forge",
+  "description": "کارگاه توانا — Mobile Software Development Forge (IDE). Build, fix, and create anywhere with universal visual guidance and offline local workspaces.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

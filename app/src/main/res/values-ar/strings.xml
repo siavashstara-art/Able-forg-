@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ABLE Forge</string>
+    <string name="app_subtitle">ورشة توانا</string>
+    <string name="app_slogan">ابنِ. أصلح. ابتكر. في أي مكان.</string>
+
+    <!-- Navigation Menu -->
+    <string name="nav_projects">المشاريع</string>
+    <string name="nav_files">الملفات</string>
+    <string name="nav_editor">محرر الأكواد</string>
+    <string name="nav_git">إدارة Git</string>
+    <string name="nav_console">وحدة الأوامر</string>
+    <string name="nav_aifix">إصلاح ذكي</string>
+    <string name="nav_deploy">النشر والتوزيع</string>
+    <string name="nav_community">المجتمع</string>
+    <string name="nav_tutorial">دليل الاستخدام</string>
+    <string name="nav_help">إرشادات بصرية</string>
+    <string name="nav_settings">الإعدادات</string>
+
+    <!-- Statuses -->
+    <string name="status_ready">جاهز</string>
+    <string name="status_modified">معدل</string>
+    <string name="status_issue">تنبيه</string>
+    <string name="status_unconfigured">غير مهيأ</string>
+    <string name="status_clean">نظيف</string>
+
+    <!-- Actions -->
+    <string name="action_create">إنشاء</string>
+    <string name="action_save">حفظ</string>
+    <string name="action_run">تشغيل</string>
+    <string name="action_commit">تثبيت (Commit)</string>
+    <string name="action_cancel">إلغاء</string>
+    <string name="action_delete">حذف</string>
+    <string name="action_next">التالي</string>
+    <string name="action_back">السابق</string>
+    <string name="action_close">إغلاق</string>
+    <string name="action_copy">نسخ</string>
+    <string name="action_undo">تراجع</string>
+    <string name="action_redo">إعادة</string>
+</resources>

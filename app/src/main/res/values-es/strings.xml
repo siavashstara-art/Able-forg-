@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ABLE Forge</string>
+    <string name="app_subtitle">Taller Hábil</string>
+    <string name="app_slogan">Construye. Repara. Crea. Donde sea.</string>
+
+    <!-- Navigation Menu -->
+    <string name="nav_projects">Proyectos</string>
+    <string name="nav_files">Archivos</string>
+    <string name="nav_editor">Editor</string>
+    <string name="nav_git">Git</string>
+    <string name="nav_console">Consola</string>
+    <string name="nav_aifix">AI Fix</string>
+    <string name="nav_deploy">Despliegue</string>
+    <string name="nav_community">Comunidad</string>
+    <string name="nav_tutorial">Tutorial</string>
+    <string name="nav_help">Guía Visual</string>
+    <string name="nav_settings">Ajustes</string>
+
+    <!-- Statuses -->
+    <string name="status_ready">LISTO</string>
+    <string name="status_modified">MODIFICADO</string>
+    <string name="status_issue">PROBLEMA</string>
+    <string name="status_unconfigured">NO CONFIGURADO</string>
+    <string name="status_clean">LIMPIO</string>
+
+    <!-- Actions -->
+    <string name="action_create">Crear</string>
+    <string name="action_save">Guardar</string>
+    <string name="action_run">Ejecutar</string>
+    <string name="action_commit">Confirmar (Commit)</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="action_next">Siguiente</string>
+    <string name="action_back">Atrás</string>
+    <string name="action_close">Cerrar</string>
+    <string name="action_copy">Copiar</string>
+    <string name="action_undo">Deshacer</string>
+    <string name="action_redo">Rehacer</string>
+</resources>
