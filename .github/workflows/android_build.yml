@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -36,7 +36,12 @@ jobs:
           fi
 
       - name: Grant execute permission for gradlew
-        run: chmod +x gradlew || true
+        run: |
+          if [ ! -f gradlew ]; then
+            echo "gradlew not found, generating wrapper..."
+            gradle wrapper || true
+          fi
+          chmod +x gradlew || true
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace
