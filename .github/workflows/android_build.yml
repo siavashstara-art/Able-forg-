@@ -23,7 +23,7 @@ jobs:
           cache: gradle
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
         with:
           packages: 'platform-tools'
           accept-android-sdk-licenses: true
@@ -49,17 +49,17 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace
 
-      - name: Build Release AAB (App Bundle)
-        run: ./gradlew bundleRelease --stacktrace || ./gradlew bundleDebug --stacktrace
-
-      - name: Upload APK Artifact
+      - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-debug-apk
           path: app/build/outputs/apk/debug/*.apk
 
-      - name: Upload AAB Artifact
+      - name: Build Release AAB (App Bundle)
+        run: ./gradlew bundleRelease --stacktrace
+
+      - name: Upload Release AAB Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release-bundle
-          path: app/build/outputs/bundle/*/*.aab
+          path: app/build/outputs/bundle/release/*.aab
