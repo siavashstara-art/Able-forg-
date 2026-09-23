@@ -511,6 +511,11 @@ private fun getSectionGuidanceContent(
       if (isFa) "این بخش کاملاً مستقل است و به هیچ وجه کار آفلاین شما را کند یا مختل نمی‌کند." else "Fully decoupled module that never disrupts core offline software creation.",
       if (isFa) "دیدن نمونه‌ها" else "Browse"
     )
+    ForgeSection.MONETIZATION -> Triple(
+      if (isFa) "پلن‌های اشتراک و اعتبار هوش مصنوعی" else "Subscription Plans & AI Credits",
+      if (isFa) "مشاهده شفاف پلن‌ها، میزان مصرف هوش مصنوعی و وضعیت اتصال درگاه پرداخت بدون وعده غیرواقعی." else "Transparent view of plans, AI token usage, and payment status without false promises.",
+      if (isFa) "مشاهده پلن‌ها" else "View Plans"
+    )
     ForgeSection.TUTORIAL -> Triple(
       if (isFa) "آموزشگاه توانا: ۱۲ درس عملی و ساده" else "ABLE Academy: 12 Practical Lessons",
       if (isFa) "از شروع از صفر تا استقرار و دسترسی‌پذیری، با زبان ساده و خواندن صوتی همه چیز را یاد بگیر." else "Learn step-by-step from ground zero with audio narration and practical tasks.",

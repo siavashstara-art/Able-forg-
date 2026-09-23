@@ -32,7 +32,7 @@ enum class GuidanceTier(
     "teaching_guidance",
     "آموزش + راهنمایی",
     "Teaching + Guidance",
-    "علاوه بر راهنمایی، مفهوم و دلیل هر کار را با زبان خیلی ساده و کودکانه بهت یاد می‌دهد.",
+    "علاوه بر راهنمایی، مفهوم و دلیل هر کار را با زبانی کاملاً روشن و گام‌به‌گام توضیح می‌دهد.",
     "Explains reasons and concepts step-by-step in clear, plain language."
   ),
   TEACHING_GUIDANCE_ASSISTANT(

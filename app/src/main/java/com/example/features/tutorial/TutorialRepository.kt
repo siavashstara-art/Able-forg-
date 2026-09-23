@@ -23,7 +23,7 @@ data class TutorialChapter(
   val shortDescEn: String,
   val contentFa: String,
   val contentEn: String,
-  val simpleExplainFa: String, // برای کودکان / زبان بسیار ساده
+  val simpleExplainFa: String, // زبان بسیار روان و قابل فهم برای نوآموزان
   val actionTarget: ForgeSection,
   val actionLabelFa: String,
   val actionLabelEn: String,

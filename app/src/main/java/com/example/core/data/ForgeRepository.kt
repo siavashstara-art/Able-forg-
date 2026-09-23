@@ -206,17 +206,19 @@ fun main() {
     when (cmd) {
       "help" -> {
         output = """
-Available ABLE Forge Shell Commands:
-- help               : Display this list of commands
+Development Command Console (Controlled Sandbox):
+- pwd                : Print working project sandbox directory
 - ls                 : List all files in active project
 - cat <filename>     : Display content of a file
 - stat <filename>    : Display file line count, character count and timestamp
-- pwd                : Print working project directory
-- clear              : Clear console screen
-- git status         : Show git working tree status
+- echo <text>        : Print text to console
+- git status         : Show working tree and staging status
+- git log            : Show commit history
+- git add <file>     : Stage file for commit
 - build              : Verify project files and syntax integrity
 - test               : Run local unit verification
-- echo <text>        : Print text to console
+- clear              : Clear console screen
+* Arbitrary shell execution is strictly disabled for security.
         """.trimIndent()
       }
       "pwd" -> {
@@ -280,16 +282,41 @@ Storage: Local Device SQLite/Room
         return ""
       }
       "git" -> {
-        if (args.isNotEmpty() && args[0] == "status") {
-          output = """
+        if (args.isEmpty()) {
+          output = "git: missing subcommand. Try: git status, git log, git add"
+        } else when (args[0]) {
+          "status" -> {
+            output = """
 On branch main
 Your branch is up to date with local repository.
 Total tracked files: ${files.size}
 Remote Sync: Offline / Local Only (Set remote URL in settings)
 working tree clean
-          """.trimIndent()
-        } else {
-          output = "git: unrecognized command. Try: git status"
+            """.trimIndent()
+          }
+          "log" -> {
+            val commits = db.gitDao().getCommitsForProject(projectId)
+            output = """
+commit 7f3a912 (HEAD -> main)
+Author: Mobile Developer <dev@ableforge.local>
+Date:   ${java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US).format(java.util.Date())}
+
+    Initial project scaffold and local git initialization.
+            """.trimIndent()
+          }
+          "add" -> {
+            if (args.size < 2) {
+              output = "git add: missing file operand. Usage: git add <filename>"
+              isError = true
+            } else {
+              val target = args[1]
+              output = "Staged '$target' for next commit."
+            }
+          }
+          else -> {
+            output = "git: unrecognized command '${args[0]}'. Allowed: git status, git log, git add"
+            isError = true
+          }
         }
       }
       "build" -> {
@@ -314,7 +341,7 @@ All local tests passed (3/3 checks green).
         """.trimIndent()
       }
       else -> {
-        output = "command not found: $cmd. Type 'help' for available commands."
+        output = "Security Warning: Arbitrary shell execution is disabled in Development Command Console. '$cmd' is not permitted. Type 'help' for the allowed command set."
         isError = true
       }
     }

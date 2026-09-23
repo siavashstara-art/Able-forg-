@@ -27,15 +27,19 @@ import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.Paid
 import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Terminal
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material.icons.filled.Workspaces
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -73,6 +77,7 @@ import com.example.core.guidance.ForgeVoiceReader
 import com.example.core.guidance.rememberForgeVoiceReader
 import com.example.core.localization.ForgeLanguage
 import com.example.core.localization.ForgeStrings
+import com.example.core.voice.SttTargetField
 import com.example.features.aifix.AiFixScreen
 import com.example.features.community.CommunityScreen
 import com.example.features.console.ConsoleScreen
@@ -84,12 +89,17 @@ import com.example.features.guidance.ContextualGuidanceBanner
 import com.example.features.guidance.FirstLaunchGuidanceDialog
 import com.example.features.guidance.ManualTierSelectionDialog
 import com.example.features.help.HelpScreen
+import com.example.features.monetization.MonetizationScreen
 import com.example.features.projects.ProjectsScreen
 import com.example.features.settings.SettingsScreen
 import com.example.features.tutorial.TutorialScreen
+import com.example.ui.components.OfflineNoticeBanner
+import com.example.ui.components.OnlineSyncStatus
+import com.example.ui.components.SttVoiceInputDialog
 import com.example.ui.components.TrafficSignalType
 import com.example.ui.components.TrafficStepFlowIndicator
 import com.example.ui.components.UniversalTrafficPill
+import com.example.ui.components.VoiceCaptionBar
 import com.example.ui.theme.MyApplicationTheme
 import kotlinx.coroutines.launch
 
@@ -137,6 +147,19 @@ fun ForgeApp(
         language = uiState.language,
         onSelectTier = { tier -> viewModel.setGuidanceTier(tier) },
         onDismiss = { viewModel.closeManualTierSelection() }
+      )
+
+      // 3. Speech-to-Text Multi-Field Dialog
+      SttVoiceInputDialog(
+        isOpen = uiState.sttDialogOpen,
+        targetTitle = uiState.sttTarget.faLabel,
+        isListening = uiState.sttListening,
+        transcribedText = uiState.sttTranscribed,
+        lastError = uiState.sttError,
+        onStartListening = { viewModel.startSttListening() },
+        onStopListening = { viewModel.stopSttListening() },
+        onConfirmText = { text -> viewModel.applySttResult(text) },
+        onDismiss = { viewModel.closeSttDialog() }
       )
 
       ModalNavigationDrawer(
@@ -204,6 +227,7 @@ fun ForgeApp(
                 Pair(ForgeSection.AI_FIX, Icons.Default.AutoAwesome),
                 Pair(ForgeSection.DEPLOY, Icons.Default.RocketLaunch),
                 Pair(ForgeSection.COMMUNITY, Icons.Default.Group),
+                Pair(ForgeSection.MONETIZATION, Icons.Default.Paid),
                 Pair(ForgeSection.TUTORIAL, Icons.Default.MenuBook),
                 Pair(ForgeSection.HELP, Icons.Default.HelpOutline),
                 Pair(ForgeSection.SETTINGS, Icons.Default.Settings)
@@ -219,6 +243,7 @@ fun ForgeApp(
                   ForgeSection.AI_FIX -> "nav_aifix"
                   ForgeSection.DEPLOY -> "nav_deploy"
                   ForgeSection.COMMUNITY -> "nav_community"
+                  ForgeSection.MONETIZATION -> "nav_monetization"
                   ForgeSection.TUTORIAL -> "nav_tutorial"
                   ForgeSection.HELP -> "nav_help"
                   ForgeSection.SETTINGS -> "nav_settings"
@@ -278,6 +303,26 @@ fun ForgeApp(
                   }
                 },
                 actions = {
+                  // STT Voice Input Trigger (Question, Command, Error, Text)
+                  IconButton(
+                    onClick = {
+                      val target = when (uiState.currentSection) {
+                        ForgeSection.CONSOLE -> SttTargetField.COMMAND
+                        ForgeSection.EDITOR -> SttTargetField.TEXT
+                        ForgeSection.AI_FIX -> SttTargetField.ERROR
+                        else -> SttTargetField.QUESTION
+                      }
+                      viewModel.openSttDialog(target)
+                    },
+                    modifier = Modifier.testTag("btn_mic_action")
+                  ) {
+                    Icon(
+                      Icons.Default.Mic,
+                      contentDescription = "ورودی صوتی (گفتار به متن)",
+                      tint = MaterialTheme.colorScheme.primary
+                    )
+                  }
+
                   // Permanent Universal Help Button
                   Button(
                     onClick = {
@@ -302,6 +347,13 @@ fun ForgeApp(
                       fontSize = 12.sp
                     )
                   }
+
+                  // Online Sync Status (PENDING / SYNCED / OFFLINE)
+                  UniversalTrafficPill(
+                    signal = uiState.remoteSyncStatus.signal,
+                    label = if (uiState.language == ForgeLanguage.FA) uiState.remoteSyncStatus.faLabel else uiState.remoteSyncStatus.enLabel,
+                    modifier = Modifier.padding(end = 4.dp)
+                  )
 
                   UniversalTrafficPill(
                     signal = if (uiState.isEditorDirty) TrafficSignalType.MODIFIED else TrafficSignalType.READY,
@@ -355,7 +407,24 @@ fun ForgeApp(
               .fillMaxSize()
               .padding(paddingValues)
           ) {
-            // Adaptive & Multi-channel Guidance Banner right below top flow
+            // 1. Transparent Offline Notice Banner
+            OfflineNoticeBanner(
+              isOnline = uiState.isOnline,
+              language = uiState.language
+            )
+
+            // 2. Voice Caption / Subtitles Bar for Low Vision, Hard of Hearing, and ADHD
+            VoiceCaptionBar(
+              caption = uiState.ttsCaption,
+              isPlaying = uiState.ttsPlaying,
+              playbackSpeed = uiState.ttsSpeed,
+              onPause = { viewModel.pauseTts() },
+              onResume = { viewModel.resumeTts() },
+              onStop = { viewModel.stopTts() },
+              onSpeedChange = { viewModel.setTtsSpeed(it) }
+            )
+
+            // 3. Adaptive & Multi-channel Guidance Banner right below top flow
             ContextualGuidanceBanner(
               section = uiState.currentSection,
               guidanceState = uiState.guidanceState,
@@ -408,8 +477,16 @@ fun ForgeApp(
                   project = uiState.activeProject,
                   commits = uiState.commits,
                   isDirty = uiState.isEditorDirty,
+                  hasAbleFlag = uiState.hasAbleFlag,
                   language = uiState.language,
-                  onCommit = { msg: String -> viewModel.commitGitChanges(msg) }
+                  onCommit = { msg: String -> viewModel.commitGitChanges(msg) },
+                  onAddAll = { viewModel.gitAddAll() },
+                  onPush = { viewModel.gitPush() },
+                  onPull = { viewModel.gitPull() },
+                  onClone = { url -> viewModel.gitClone(url) },
+                  onTestConcurrencyCheck = { viewModel.testGitConcurrencyCheck() },
+                  onToggleAbleFlag = { viewModel.toggleAbleFlag() },
+                  concurrencyErrorText = uiState.gitConcurrencyError
                 )
                 ForgeSection.CONSOLE -> ConsoleScreen(
                   project = uiState.activeProject,
@@ -420,9 +497,14 @@ fun ForgeApp(
                 ForgeSection.AI_FIX -> AiFixScreen(
                   project = uiState.activeProject,
                   issues = uiState.diagnosticIssues,
+                  activeProposal = uiState.activeProposal,
+                  fixStatusMessage = uiState.fixStatusMessage,
                   geminiKeyConfigured = uiState.geminiKeyConfigured,
                   language = uiState.language,
-                  onRunDiagnostics = { viewModel.runDiagnostics() }
+                  onRunDiagnostics = { viewModel.runDiagnostics() },
+                  onProposeFix = { issue -> viewModel.proposeAiFix(issue) },
+                  onConfirmApplyFix = { proposal -> viewModel.confirmAndApplyAiFix(proposal) },
+                  onDismissProposal = { viewModel.dismissAiFixProposal() }
                 )
                 ForgeSection.DEPLOY -> DeployScreen(
                   project = uiState.activeProject,
@@ -430,7 +512,49 @@ fun ForgeApp(
                   language = uiState.language
                 )
                 ForgeSection.COMMUNITY -> CommunityScreen(
-                  language = uiState.language
+                  user = uiState.communityUser ?: com.example.core.community.UserProfile(
+                    id = "u_me",
+                    username = "developer",
+                    displayName = "Mobile Developer",
+                    bio = "Building accessible apps with ABLE Forge / کارگاه توانا",
+                    skills = listOf("Kotlin", "Jetpack Compose", "Accessibility QA"),
+                    xpBalance = 120L,
+                    referralCode = "ABLE-DEV-701",
+                    isVerified = true
+                  ),
+                  topics = uiState.communityTopics,
+                  activeTopic = uiState.activeTopic,
+                  messages = uiState.communityMessages,
+                  showcases = uiState.communityShowcases,
+                  xpEvents = uiState.xpEvents,
+                  language = uiState.language,
+                  onSelectTopic = { viewModel.selectCommunityTopic(it) },
+                  onSendMessage = { viewModel.sendCommunityMessage(it) },
+                  onAddSkill = { viewModel.addCommunitySkill(it) },
+                  onRemoveSkill = { viewModel.removeCommunitySkill(it) },
+                  onBlockUser = { viewModel.blockCommunityUser(it) },
+                  onReportMessage = { msgId, reason -> viewModel.reportCommunityMessage(msgId, reason) },
+                  onSendOrdinaryGift = { receiver, amt -> viewModel.sendOrdinaryXpGift(receiver, amt) }
+                )
+                ForgeSection.MONETIZATION -> MonetizationScreen(
+                  currentTier = uiState.currentPlanTier,
+                  subscriptionExpiry = uiState.subscriptionExpiry,
+                  selectedDurationMonths = uiState.selectedDurationMonths,
+                  availablePlans = uiState.availablePlans,
+                  aiCredits = uiState.aiCredits,
+                  coinEconomy = uiState.coinEconomy,
+                  paymentIdentity = uiState.paymentIdentity,
+                  lastPurchaseResult = uiState.lastPurchaseResult,
+                  lastVerificationResult = uiState.lastVerificationResult,
+                  restoreMessage = uiState.restoreMessage,
+                  language = uiState.language,
+                  onSelectDuration = { viewModel.selectMonetizationDuration(it) },
+                  onInitiatePurchase = { plan, duration, identity -> viewModel.initiatePurchase(plan, duration, identity) },
+                  onPurchaseWithCoins = { tier, duration -> viewModel.purchaseWithCoins(tier, duration) },
+                  onConsumeHeavyAi = { viewModel.consumeHeavyAi(it) },
+                  onRestorePurchases = { viewModel.restorePurchases() },
+                  onUpdateIdentity = { viewModel.updatePaymentIdentity(it) },
+                  onSelectCoinUnitName = { en, fa -> viewModel.setCoinUnitName(en, fa) }
                 )
                 ForgeSection.TUTORIAL -> TutorialScreen(
                   language = uiState.language,

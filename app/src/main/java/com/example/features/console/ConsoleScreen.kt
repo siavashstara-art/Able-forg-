@@ -68,13 +68,15 @@ fun ConsoleScreen(
 
   val quickCommands = listOf(
     "help",
-    "ls",
     "pwd",
+    "ls",
+    "cat app.js",
+    "stat index.html",
+    "echo Hello ABLE Forge",
+    "git status",
+    "git log",
     "build",
     "test",
-    "git status",
-    "stat index.html",
-    "cat app.js",
     "clear"
   )
 

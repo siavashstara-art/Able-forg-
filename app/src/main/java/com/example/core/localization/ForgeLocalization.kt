@@ -43,6 +43,7 @@ object ForgeStrings {
     "nav_aifix" to "AI Fix",
     "nav_deploy" to "Deploy",
     "nav_community" to "Community",
+    "nav_monetization" to "Plans & AI Credits",
     "nav_tutorial" to "Tutorial",
     "nav_help" to "Visual Guide",
     "nav_settings" to "Settings",
@@ -108,19 +109,27 @@ object ForgeStrings {
     "git_no_changes" to "Working tree clean. No uncommitted modifications.",
     "git_remote_status" to "Remote Sync: Offline / Local Only (Configure remote URL to enable push/pull)",
     "git_history" to "Commit History",
+    "git_clone" to "Clone Repository",
+    "git_pull" to "Git Pull",
+    "git_push" to "Git Push",
+    "git_add" to "Git Add",
+    "git_concurrency_error" to "Concurrent Modification Error: Remote HEAD has diverged. Auto-retry disabled.",
 
     // Console Screen
-    "console_title" to "Mobile Command Console",
-    "console_subtitle" to "Real built-in shell interpreter & local script runner.",
-    "console_hint" to "Type command (e.g., help, ls, cat <file>, stat, clear)...",
-    "console_welcome" to "ABLE Forge Shell v1.0 [Local Engine Ready]\nType 'help' for available commands.",
+    "console_title" to "Development Command Console",
+    "console_subtitle" to "Safe, restricted development console. Arbitrary shell execution is disabled.",
+    "console_hint" to "Enter safe command (pwd, ls, cat, stat, echo, git status, git log, clear)...",
+    "console_welcome" to "Development Command Console v0.1\nRestricted safe execution environment. Type 'help' for available commands.",
 
     // AI Fix Screen
-    "aifix_title" to "AI & Syntax Code Fixer",
-    "aifix_subtitle" to "Deterministic local diagnostics + Gemini API connector.",
+    "aifix_title" to "AI Code Fixer & Diagnostics",
+    "aifix_subtitle" to "Human-reviewed Crash-Recoverable Replacement pipeline.",
     "aifix_run_check" to "Run Code Diagnostics",
-    "aifix_local_lint" to "Local Syntax & Lint Engine",
-    "aifix_gemini_status" to "Gemini API Connection Status",
+    "aifix_local_lint" to "Diagnostic Issues",
+    "aifix_proposal_title" to "Fix Proposal (Requires Review)",
+    "aifix_apply_btn" to "Review & Apply Fix",
+    "aifix_verify_badge" to "Crash-Recoverable Replacement",
+    "aifix_gemini_status" to "AI Provider Status",
     "aifix_gemini_info" to "Real API: Set GEMINI_API_KEY in AI Studio Secrets panel. No simulated successes are returned.",
     "aifix_no_issues" to "All local syntax checks passed! Code is well-formed.",
 
@@ -132,10 +141,16 @@ object ForgeStrings {
     "deploy_target_spec" to "Android APK Manifest Spec",
     "deploy_status_note" to "Deployment pipeline verified locally on mobile storage.",
 
-    // Community
-    "community_title" to "Developer Community (Module Preview)",
-    "community_subtitle" to "Isolated preview module. Core development remains strictly local & independent.",
-    "community_notice" to "Decoupled from Core: Community features run independently without requiring backend dependencies.",
+    // Community & Economy
+    "community_title" to "ABLE Community & Economy",
+    "community_subtitle" to "Modular collaboration network. Core development remains strictly local & independent.",
+    "community_notice" to "Decoupled Architecture: Core IDE operations run 100% offline without remote network dependency.",
+    "community_profile" to "Developer Profile",
+    "community_rooms" to "Topic Rooms",
+    "community_collab" to "Collaboration & Roles",
+    "community_xp_ledger" to "XP Ledger & Economy",
+    "community_leagues" to "Leagues & Recognition",
+    "community_disclaimer" to "XP points or purchases DO NOT guarantee that an individual receives land, employment, a management position, or a council seat.",
 
     // Tutorial
     "tutorial_title" to "Mobile Dev Tutorial",
@@ -185,6 +200,7 @@ object ForgeStrings {
     "nav_aifix" to "رفع خطا (AI)",
     "nav_deploy" to "استقرار",
     "nav_community" to "جامعه",
+    "nav_monetization" to "پلن‌ها و اعتبارات",
     "nav_tutorial" to "آموزش",
     "nav_help" to "راهنمای تصویری",
     "nav_settings" to "تنظیمات",
@@ -250,19 +266,27 @@ object ForgeStrings {
     "git_no_changes" to "مخزن تمیز است؛ تغییری برای کامیت وجود ندارد.",
     "git_remote_status" to "وضعیت سرور دوردست: آفلاین / فقط محلی (برای Push/Pull نشانی Remote تنظیم شود)",
     "git_history" to "تاریخچه کامیت‌ها",
+    "git_clone" to "کلون مخزن گیت",
+    "git_pull" to "دریافت تغییرات (Git Pull)",
+    "git_push" to "ارسال تغییرات (Git Push)",
+    "git_add" to "افزودن به استیج (Git Add)",
+    "git_concurrency_error" to "خطای تداخل همزمانی: شاخه سرور تغییر کرده است. تلاش مجدد خودکار در نسخه v0.1 غیرفعال است.",
 
     // Console
-    "console_title" to "کنسول خط فرمان موبایل",
-    "console_subtitle" to "مفسر دستورات محلی و اجرای اسکریپت روی گوشی.",
-    "console_hint" to "دستور را وارد کنید (مانند help, ls, cat, stat, clear)...",
-    "console_welcome" to "کنسول کارگاه توانا نسخه ۱.۰ [موتور محلی آماده]\nبرای مشاهده فهرست دستورات عبارت 'help' را وارد کنید.",
+    "console_title" to "Development Command Console",
+    "console_subtitle" to "کنسول خط فرمان کنترل‌شده و امن. اجرای شل دلخواه غیرفعال است.",
+    "console_hint" to "دستور امن را وارد کنید (pwd, ls, cat, stat, echo, git status, git log, clear)...",
+    "console_welcome" to "کنسول دستورات توسعه (Development Command Console v0.1)\nمحیط اجرای امن و ایزوله. برای مشاهده دستورات 'help' را وارد کنید.",
 
     // AI Fix
-    "aifix_title" to "تحلیلگر و رفع خطای کد",
-    "aifix_subtitle" to "عیب‌یابی استاتیک محلی + درگاه اتصال به هوش مصنوعی جمینای.",
+    "aifix_title" to "تحلیلگر و رفع خطای کد (AI Fix)",
+    "aifix_subtitle" to "فرآیند بازبینی انسانی و جایگزینی با قابلیت بازیابی از کرش (Crash-Recoverable Replacement).",
     "aifix_run_check" to "اجرای بررسی کدهای پروژه",
-    "aifix_local_lint" to "موتور خطایاب نحوی محلی",
-    "aifix_gemini_status" to "وضعیت اتصال به API جمینای",
+    "aifix_local_lint" to "موارد و خطاهای شناسایی‌شده",
+    "aifix_proposal_title" to "پیشنهاد اصلاح کد (نیازمند تأیید شما)",
+    "aifix_apply_btn" to "بازبینی و اعمال تغییر",
+    "aifix_verify_badge" to "جایگزینی با قابلیت بازیابی در کرش",
+    "aifix_gemini_status" to "وضعیت ارائه‌دهنده هوش مصنوعی",
     "aifix_gemini_info" to "بدون موفقیت ساختگی: کلید GEMINI_API_KEY باید در پنل Secrets اضافه شود.",
     "aifix_no_issues" to "تمام بررسی‌های محلی موفق بودند. ساختار کد سالم است.",
 
@@ -275,9 +299,15 @@ object ForgeStrings {
     "deploy_status_note" to "مراحل خروجی به‌صورت کاملاً محلی روی حافظه دستگاه بررسی می‌شوند.",
 
     // Community
-    "community_title" to "جامعه کاربری (پیش‌نمایش ماژول)",
-    "community_subtitle" to "ماژول مجزا — بخش توسعه اصلی کاملاً مستقل و آفلاین باقی می‌ماند.",
-    "community_notice" to "تفکیک معماری: ویژگی‌های جامعه بدون تأثیر منفی بر هسته اصلی فعال خواهند شد.",
+    "community_title" to "جامعه کاربری و اقتصاد توانا",
+    "community_subtitle" to "شبکه همکاری ماژولار. هسته توسعه نرم‌افزار کاملاً مستقل و آفلاین باقی می‌ماند.",
+    "community_notice" to "معماری ماژولار: هسته IDE به صورت ۱۰۰٪ آفلاین و بدون وابستگی به شبکه دوردست کار می‌کند.",
+    "community_profile" to "پروفایل توسعه‌دهنده",
+    "community_rooms" to "اتاق‌های موضوعی گفتگو",
+    "community_collab" to "فرصت‌های همکاری و نقش‌ها",
+    "community_xp_ledger" to "دفتر کل امتیاز و پاداش (XP Ledger)",
+    "community_leagues" to "لیگ‌ها و نظام مشارکت",
+    "community_disclaimer" to "امتیاز XP یا خریدهای واجد شرایط هرگز متضمن دریافت زمین، استخدام، سمت مدیریتی یا کرسی شورا نیستند.",
 
     // Tutorial
     "tutorial_title" to "آموزش کار با برنامه",
