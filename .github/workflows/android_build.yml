@@ -42,22 +42,9 @@ jobs:
             base64 -d debug.keystore.base64 > debug.keystore
           fi
 
-      - name: Setup Secure Environment & API Keys (.env)
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GITHUB_API_TOKEN: ${{ secrets.GITHUB_API_TOKEN }}
-          PAYMENT_GATEWAY_API_KEY: ${{ secrets.PAYMENT_GATEWAY_API_KEY }}
+      - name: Ensure Empty Local .env for Secrets Gradle Plugin (No Embedded Secrets)
         run: |
-          cp .env.example .env
-          if [ -n "$GEMINI_API_KEY" ]; then
-            sed -i "s|^GEMINI_API_KEY=.*|GEMINI_API_KEY=${GEMINI_API_KEY}|" .env
-          fi
-          if [ -n "$GITHUB_API_TOKEN" ]; then
-            sed -i "s|^GITHUB_API_TOKEN=.*|GITHUB_API_TOKEN=${GITHUB_API_TOKEN}|" .env
-          fi
-          if [ -n "$PAYMENT_GATEWAY_API_KEY" ]; then
-            sed -i "s|^PAYMENT_GATEWAY_API_KEY=.*|PAYMENT_GATEWAY_API_KEY=${PAYMENT_GATEWAY_API_KEY}|" .env
-          fi
+          touch .env
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -80,18 +67,25 @@ jobs:
           name: app-debug-aab
           path: app/build/outputs/bundle/debug/*.aab
 
-      - name: Build Release AAB (App Bundle)
+      - name: Build Release AAB (If Release Signing Configured)
         env:
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
           KEYSTORE_PATH: ${{ secrets.KEYSTORE_PATH }}
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          if [ -z "$STORE_PASSWORD" ] || [ -z "$KEY_PASSWORD" ]; then
+          TARGET_KEYSTORE="${KEYSTORE_PATH:-my-upload-key.jks}"
+          if [ -n "$RELEASE_KEYSTORE_BASE64" ] && [ ! -f "$TARGET_KEYSTORE" ]; then
+            echo "$RELEASE_KEYSTORE_BASE64" | base64 -d > "$TARGET_KEYSTORE"
+          fi
+          if [ -f "$TARGET_KEYSTORE" ] && [ -n "$STORE_PASSWORD" ] && [ -n "$KEY_PASSWORD" ]; then
+            ./gradlew bundleRelease --stacktrace
+          else
             echo "RELEASE SIGNING NOT CONFIGURED"
           fi
-          ./gradlew bundleRelease --stacktrace
 
       - name: Upload Release AAB Artifact
+        if: hashFiles('app/build/outputs/bundle/release/*.aab') != ''
         uses: actions/upload-artifact@v4
         with:
           name: app-release-bundle

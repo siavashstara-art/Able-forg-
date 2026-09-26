@@ -214,9 +214,9 @@ class ForgeViewModel(application: Application) : AndroidViewModel(application) {
       doNotDisturb = savedDnd
     )
 
-    // Check if API key is present in BuildConfig (injected via Secrets Gradle Plugin from .env)
-    val geminiKey = com.example.BuildConfig.GEMINI_API_KEY
-    _geminiKeyConfigured.value = geminiKey.isNotBlank() && geminiKey != "MY_GEMINI_API_KEY"
+    // v0.1 uses the local deterministic StandardRuleBasedAiFixProvider on-device;
+    // no API key is embedded into BuildConfig or packaged into the APK/AAB.
+    _geminiKeyConfigured.value = false
 
     viewModelScope.launch {
       repository.ensureInitialData()
