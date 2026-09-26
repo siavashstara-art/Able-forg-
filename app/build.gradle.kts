@@ -63,6 +63,15 @@ android {
   }
 }
 
+// Automated secure .env initialization for local and CI/CD builds:
+// Ensures .env exists by bootstrapping from .env.example if missing, without overwriting
+// secrets injected by the AI Studio Secrets panel.
+val envFile = rootProject.file(".env")
+val envExampleFile = rootProject.file(".env.example")
+if (!envFile.exists() && envExampleFile.exists()) {
+  envExampleFile.copyTo(envFile, overwrite = false)
+}
+
 // Configure the Secrets Gradle Plugin to use .env and .env.example files
 // to match the convention used in Web projects.
 secrets {

@@ -15,36 +15,52 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v5
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           cache: gradle
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v4
+        uses: android-actions/setup-android@v3
         with:
           packages: 'platform-tools'
-          accept-android-sdk-licenses: true
+          accept-android-sdk-licenses: false
+
+      - name: Accept Android SDK Licenses Non-Interactively
+        run: |
+          SDKMANAGER="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
+          if [ ! -x "$SDKMANAGER" ]; then
+            SDKMANAGER=$(command -v sdkmanager)
+          fi
+          yes | "$SDKMANAGER" --licenses > /dev/null
+
+      - name: Restore Debug Keystore from Base64
+        run: |
+          if [ ! -f debug.keystore ] && [ -f debug.keystore.base64 ]; then
+            base64 -d debug.keystore.base64 > debug.keystore
+          fi
 
       - name: Setup Secure Environment & API Keys (.env)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GITHUB_API_TOKEN: ${{ secrets.GITHUB_API_TOKEN }}
+          PAYMENT_GATEWAY_API_KEY: ${{ secrets.PAYMENT_GATEWAY_API_KEY }}
         run: |
-          echo "Setting up .env from GitHub secrets if available..."
-          if [ -n "${{ secrets.GEMINI_API_KEY }}" ]; then
-            echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
-          else
-            echo "Using placeholder .env.example..."
-            cp .env.example .env
+          cp .env.example .env
+          if [ -n "$GEMINI_API_KEY" ]; then
+            sed -i "s|^GEMINI_API_KEY=.*|GEMINI_API_KEY=${GEMINI_API_KEY}|" .env
+          fi
+          if [ -n "$GITHUB_API_TOKEN" ]; then
+            sed -i "s|^GITHUB_API_TOKEN=.*|GITHUB_API_TOKEN=${GITHUB_API_TOKEN}|" .env
+          fi
+          if [ -n "$PAYMENT_GATEWAY_API_KEY" ]; then
+            sed -i "s|^PAYMENT_GATEWAY_API_KEY=.*|PAYMENT_GATEWAY_API_KEY=${PAYMENT_GATEWAY_API_KEY}|" .env
           fi
 
       - name: Grant execute permission for gradlew
-        run: |
-          if [ ! -f gradlew ]; then
-            echo "gradlew not found, generating wrapper..."
-            gradle wrapper || true
-          fi
-          chmod +x gradlew || true
+        run: chmod +x gradlew
 
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace
@@ -55,8 +71,25 @@ jobs:
           name: app-debug-apk
           path: app/build/outputs/apk/debug/*.apk
 
+      - name: Build Debug AAB (App Bundle)
+        run: ./gradlew bundleDebug --stacktrace
+
+      - name: Upload Debug AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-aab
+          path: app/build/outputs/bundle/debug/*.aab
+
       - name: Build Release AAB (App Bundle)
-        run: ./gradlew bundleRelease --stacktrace
+        env:
+          KEYSTORE_PATH: ${{ secrets.KEYSTORE_PATH }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -z "$STORE_PASSWORD" ] || [ -z "$KEY_PASSWORD" ]; then
+            echo "RELEASE SIGNING NOT CONFIGURED"
+          fi
+          ./gradlew bundleRelease --stacktrace
 
       - name: Upload Release AAB Artifact
         uses: actions/upload-artifact@v4
