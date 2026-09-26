@@ -30,27 +30,55 @@ jobs:
 
       - name: Accept Android SDK Licenses Non-Interactively
         run: |
+          mkdir -p "${ANDROID_HOME}/licenses"
+          printf "\n8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb78af6dfcb131a6481e\n24333f8a63b6825ea9c5514f83c2829b004d1fee\n859f317696f67ef3d7f30a50a5560e7834b43903\n" > "${ANDROID_HOME}/licenses/android-sdk-license"
+          printf "\n84831b9409646a918e30573bab4c9c91346d8abd\n504667f4c0de7af1a06de9f4b1727b84351f2910\n" > "${ANDROID_HOME}/licenses/android-sdk-preview-license"
           SDKMANAGER="${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
           if [ ! -x "$SDKMANAGER" ]; then
             SDKMANAGER=$(command -v sdkmanager)
           fi
-          yes | "$SDKMANAGER" --licenses > /dev/null
-
-      - name: Restore Debug Keystore from Base64
-        run: |
-          if [ ! -f debug.keystore ] && [ -f debug.keystore.base64 ]; then
-            base64 -d debug.keystore.base64 > debug.keystore
+          set +e
+          yes | "$SDKMANAGER" --sdk_root="${ANDROID_HOME}" --licenses > /dev/null
+          SDK_EXIT=${PIPESTATUS[1]}
+          set -e
+          if [ "$SDK_EXIT" -ne 0 ]; then
+            exit "$SDK_EXIT"
           fi
 
-      - name: Ensure Empty Local .env for Secrets Gradle Plugin (No Embedded Secrets)
+      - name: Restore or Generate Debug Keystore
         run: |
-          touch .env
+          if [ ! -f debug.keystore ] && [ -f debug.keystore.base64 ]; then
+            base64 -d debug.keystore.base64 > debug.keystore || base64 --decode debug.keystore.base64 > debug.keystore || rm -f debug.keystore
+          fi
+          if [ ! -s debug.keystore ]; then
+            rm -f debug.keystore
+            keytool -genkeypair -v \
+              -keystore debug.keystore \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+          test -s debug.keystore
+
+      - name: Ensure Empty Local .env and .env.example for Secrets Gradle Plugin (No Embedded Secrets)
+        run: |
+          touch .env .env.example
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: |
+          set -o pipefail
+          if ! ./gradlew assembleDebug --no-configuration-cache -Dkotlin.compiler.execution.strategy=daemon -Djava.awt.headless=true --max-workers=2 2>&1 | tee build_debug_apk.log; then
+            echo "=== GRADLE FAILURE SUMMARY (assembleDebug) ==="
+            grep -E -A 25 "FAILURE:|What went wrong:|Execution failed for task" build_debug_apk.log || tail -n 50 build_debug_apk.log
+            exit 1
+          fi
 
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
@@ -59,7 +87,13 @@ jobs:
           path: app/build/outputs/apk/debug/*.apk
 
       - name: Build Debug AAB (App Bundle)
-        run: ./gradlew bundleDebug --stacktrace
+        run: |
+          set -o pipefail
+          if ! ./gradlew bundleDebug --no-configuration-cache -Dkotlin.compiler.execution.strategy=daemon -Djava.awt.headless=true --max-workers=2 2>&1 | tee build_debug_aab.log; then
+            echo "=== GRADLE FAILURE SUMMARY (bundleDebug) ==="
+            grep -E -A 25 "FAILURE:|What went wrong:|Execution failed for task" build_debug_aab.log || tail -n 50 build_debug_aab.log
+            exit 1
+          fi
 
       - name: Upload Debug AAB Artifact
         uses: actions/upload-artifact@v4
@@ -79,7 +113,7 @@ jobs:
             echo "$RELEASE_KEYSTORE_BASE64" | base64 -d > "$TARGET_KEYSTORE"
           fi
           if [ -f "$TARGET_KEYSTORE" ] && [ -n "$STORE_PASSWORD" ] && [ -n "$KEY_PASSWORD" ]; then
-            ./gradlew bundleRelease --stacktrace
+            ./gradlew bundleRelease --no-configuration-cache -Dkotlin.compiler.execution.strategy=daemon -Djava.awt.headless=true --max-workers=2
           else
             echo "RELEASE SIGNING NOT CONFIGURED"
           fi
